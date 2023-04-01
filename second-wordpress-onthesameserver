@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  seconddb:
+    image: mysql:5.7
+    volumes:
+      - seconddb_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_TCP_PORT: 3307
+      MYSQL_UNIX_PORT: 33070
+    ports:
+      - "3307:3306"
+      - "33070:33060"
+
+  secondwordpress:
+    depends_on:
+      - seconddb
+    image: wordpress:latest
+    ports:
+      - "8092:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: seconddb:3307
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - secondwordpress_data:/var/www/html
+      - ./upload.ini:/usr/local/etc/php/conf.d/uploads.ini
+volumes:
+  seconddb_data: {}
+  secondwordpress_data: {}
